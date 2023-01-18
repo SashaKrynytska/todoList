@@ -4,6 +4,8 @@ import Form from './Form/Form';
 import TodoEditor from './TodoEditor/TodoEditor';
 import Filter from './Filter/Filter';
 import { nanoid } from 'nanoid';
+import Reader from './Reader/Reader';
+import publications from '../../src/publications.json';
 
 export class App extends Component {
   state = {
@@ -15,6 +17,24 @@ export class App extends Component {
     ],
     filter: '',
   };
+
+  componentDidMount() {
+    console.log('App componentDidMount');
+    // перезаписываем state
+    const todos = localStorage.getItem('todos'); //вернет строку
+    const parsedTodos = JSON.parse(todos);
+    if (parsedTodos) {
+      this.setState({ todos: parsedTodos });
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state.todos !== prevState.todos) {
+      console.log('Обновилось поле todos, записываю todos в хранилище');
+
+      localStorage.setItem('todos', JSON.stringify(this.state.todos));
+    }
+  }
 
   deleteTodo = todoId => {
     this.setState(prevState => ({
@@ -107,6 +127,7 @@ export class App extends Component {
     return (
       //создаем пропс онсабмит и передаем его через пропс в форму
       <>
+        <Reader items={publications} />
         <TodoEditor onSubmit={this.addTodo} />
         <Form onSubmit={this.formSubmitHandler} />
         <div className="ToDoList__p">
